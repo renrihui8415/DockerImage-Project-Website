@@ -70,7 +70,7 @@ if task=='rds_init':
     # test for db
     conn = pymysql.connect(host=mysql_host_name, user=username, password=password, db=mysql_database, connect_timeout=10)
     print('connection to {} is successful'.format(mysql_host_name))
-    sql_query=' SELECT count(ROUTINE_NAME) FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_TYPE="PROCEDURE" AND ROUTINE_SCHEMA={} and ROUTINE_NAME LIKE "sp_{}%";'.format(mysql_database,s3_key_withoutextension)
+    sql_query=' SELECT count(ROUTINE_NAME) FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_TYPE="PROCEDURE" AND ROUTINE_SCHEMA="{}" and ROUTINE_NAME LIKE "sp_{}%";'.format(mysql_database,s3_key_withoutextension)
     # the above mysql command line may take longer time than python lines to complete
     # use a loop to get the correct result
     attempts=0
