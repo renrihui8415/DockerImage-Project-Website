@@ -19,10 +19,9 @@ mysql_database=os.environ['mysql_database']
 
 secret_dict=eval(secret_string)
 username = secret_dict['username']
-print(username)
 password = secret_dict['password']
 mysql_host_name=rds_endpoint[0:-5]
-print(mysql_host_name)
+# to elimite the port number in the end
 
 file_name=os.environ['file_name']
 s3_bucket=os.environ['s3_bucket']
@@ -46,25 +45,22 @@ if task=='rds_init':
         count=count+1
     procedures_num=count
     print('file_name is {}, including {} procedures'.format(file_name,procedures_num))
+
     stage=2
     # execute the whole file using MySQL command line
     # first to solve the problem 'mysql not found'
     # find mysql 
-    
     find_sql='which mysql'
     process1=subprocess.run(find_sql, stdout=subprocess.PIPE, shell=True )
     result=process1.stdout.decode('utf-8')
     print("MySQL installed in {}".format(result))
+    # get MySQL bin from full PATH
     mysql_path=result[0:-7]
     print('mysql_path is {}'.format(mysql_path))
     # set MySQL bin folder to PATH
     set_path="export PATH={}:$PATH".format(result)
     process2=subprocess.Popen(set_path,shell=True)
 
-    #current_workdir=os.getcwd()
-    #print(current_workdir)
-    #file_path='{}/{}'.format(current_workdir,file_name)
-    #print('file_path is {}'.format(file_path))
     # finally execute .sql file
     mysql_command='mysql -h {} -u {} -p{} -D {} < /{}'.format(mysql_host_name,username,password,mysql_database,file_name)
     print('init_command is {}'.format(mysql_command))
@@ -75,11 +71,10 @@ if task=='rds_init':
     conn = pymysql.connect(host=mysql_host_name, user=username, password=password, db=mysql_database, connect_timeout=10)
     print('connection to {} is successful'.format(mysql_host_name))
     sql_query=' SELECT count(ROUTINE_NAME) FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_TYPE="PROCEDURE" AND ROUTINE_SCHEMA={} and ROUTINE_NAME LIKE "sp_{}%";'.format(mysql_database,s3_key_withoutextension)
-    #sql_query=' SELECT ROUTINE_NAME FROM INFORMATION_SCHEMA.ROUTINES WHERE ROUTINE_TYPE="PROCEDURE";'.format(s3_key_withoutextension)
-    # the above mysql command line may take time to complete
-    # use a loop to find the final result of executing command line
+    # the above mysql command line may take longer time than python lines to complete
+    # use a loop to get the correct result
     attempts=0
-    MAX_WAIT_CYCLES=20
+    MAX_WAIT_CYCLES=2
     print("Executing {}".format(sql_query))
     record=0
     while attempts < MAX_WAIT_CYCLES:
