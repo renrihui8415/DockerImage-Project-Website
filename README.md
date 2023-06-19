@@ -24,7 +24,7 @@ AWS RDS for MySQL (Not Aurora MySQL) have below limitations for data loading:
     https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/UsingWithRDS.MasterAccounts.html
 
     It is recommended to create a new user dedicated for daily task with the least privilege. Lambda in the project will
-    connect AWS RDS for MySQL in the same VPC using this user login info, take part in ETL job. I suggest to create a user per task per time.
+    connect AWS RDS for MySQL in the same VPC using this user login info, take part in ETL job. I suggest creating a user per task per time.
 
     The user must be created @'%', instead of @'endpoint' or @'localhost'. The privileges granted to this user should be restricted
     according its task.
